@@ -1,9 +1,11 @@
 import re
 import os
 import time
+import json
 from pathlib import Path
 import requests
 from tqdm import tqdm
+
 
 RAW_DIR = Path("data/raw")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -14,33 +16,36 @@ def slugify(name: str) -> str:
     name = re.sub(r"\s+", "_", name)
     return name
 
-def fetch_wikipedia_extract(title: str, lang: str = "fr") -> str:
+def fetch_wikipedia_extract(title: str, lang: str = "fr") -> dict:
     url = f"https://{lang}.wikipedia.org/w/api.php"
     params = {
-        "action": "query",
+        "action": "parse",
+        "page": title,
+        "prop": "wikitext",
         "format": "json",
-        "prop": "extracts",
-        "explaintext": 1,     
         "redirects": 1,
-        "titles": title,
-    }
-    headers = {
-        "User-Agent": "narrativesacteurs",
-        "Accept": "application/json",
     }
 
-    r = requests.get(url, params=params, headers=headers, timeout=30)
+    r = requests.get(url, params=params, headers={"User-Agent": "narrativesacteurs"}, timeout=30)
     r.raise_for_status()
 
-    pages = r.json().get("query", {}).get("pages", {})
-    page = next(iter(pages.values()), {})
-    return page.get("extract", "") or ""
+    data = r.json()
+    return {
+        "title": data["parse"]["title"],
+        "pageid": data["parse"]["pageid"],
+        "language": lang,
+        "wikitext": data["parse"]["wikitext"]["*"]
+    }
 
 
-def save_text(entity: str, lang: str, text: str) -> Path:
-    filename = f"{slugify(entity)}.{lang}.txt"
+
+def save_json(entity: str, lang: str, data: dict) -> Path:
+    filename = f"{slugify(entity)}.{lang}.json"
     path = RAW_DIR / filename
-    path.write_text(text, encoding="utf-8")
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
     return path
 
 def load_entities(path: str) -> list[str]:
@@ -60,7 +65,7 @@ def main():
 
             try:
                 text = fetch_wikipedia_extract(entity, lang=lang)
-                save_text(entity, lang, text)
+                save_json(entity, lang, text)
             except Exception as e:
                 # On log et on continue
                 err_path = RAW_DIR / f"{slugify(entity)}.{lang}.error.txt"

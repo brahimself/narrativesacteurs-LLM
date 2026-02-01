@@ -1,67 +1,112 @@
-import re
+import json
 from pathlib import Path
 from tqdm import tqdm
+from typing import List
+import nltk
 
-RAW_DIR = Path("data/raw")
+# Téléchargement tokenizer phrase (une seule fois)
+nltk.download("punkt")
+
+CLEAN_DIR = Path("data/clean")
 CHUNK_DIR = Path("data/chunks")
+
+CLEAN_DIR.mkdir(parents=True, exist_ok=True)
 CHUNK_DIR.mkdir(parents=True, exist_ok=True)
 
-def split_paragraphs(text: str) -> list[str]:
-    text = text.replace("\r\n", "\n").strip()
-    paras = [p.strip() for p in re.split(r"\n{2,}", text) if p.strip()]
+# -------------------- PARAMÈTRES --------------------
 
-    # Dédup consécutif (évite les répétitions visibles)
-    deduped = []
-    prev = None
-    for p in paras:
-        if p == prev:
-            continue
-        deduped.append(p)
-        prev = p
+MAX_TOKENS = 350
+OVERLAP = 50
 
-    return deduped
+# Tokenisation simple (LLM-friendly)
+def count_tokens(text: str) -> int:
+    return len(text.split())
 
+def split_sentences(text: str) -> List[str]:
+    return nltk.sent_tokenize(text)
 
-def chunk_paragraphs(paras: list[str], max_chars: int = 6000, overlap_paras: int = 1) -> list[str]:
-    """
-    max_chars ~ limite simple (approx). 6000 chars ~ 1000-1500 tokens selon langue.
-    overlap_paras: nb de paragraphes répétés entre chunks pour garder la continuité.
-    """
+# -------------------- CHUNKING --------------------
+
+def chunk_section(
+    sentences: List[str],
+    max_tokens: int,
+    overlap: int
+) -> List[str]:
     chunks = []
-    current = []
-    current_len = 0
+    current_chunk = []
+    current_tokens = 0
 
-    for p in paras:
-        if current_len + len(p) + 2 > max_chars and current:
-            chunks.append("\n\n".join(current))
-            # overlap: on garde les derniers paragraphes
-            current = current[-overlap_paras:] if overlap_paras > 0 else []
-            current_len = sum(len(x) for x in current) + 2 * max(0, len(current) - 1)
+    for sentence in sentences:
+        tokens = count_tokens(sentence)
 
-        current.append(p)
-        current_len += len(p) + 2
+        if current_tokens + tokens > max_tokens:
+            chunks.append(" ".join(current_chunk))
 
-    if current:
-        chunks.append("\n\n".join(current))
+            # overlap
+            overlap_tokens = 0
+            overlap_chunk = []
+
+            for s in reversed(current_chunk):
+                t = count_tokens(s)
+                if overlap_tokens + t > overlap:
+                    break
+                overlap_chunk.insert(0, s)
+                overlap_tokens += t
+
+            current_chunk = overlap_chunk
+            current_tokens = overlap_tokens
+
+        current_chunk.append(sentence)
+        current_tokens += tokens
+
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
 
     return chunks
 
+# -------------------- PIPELINE COMPLET --------------------
+
+def chunk_document(data: dict) -> List[dict]:
+    chunks = []
+    entity = data["entity"]
+    lang = data["language"]
+
+    for section, text in data["sections"].items():
+        sentences = split_sentences(text)
+        section_chunks = chunk_section(
+            sentences,
+            max_tokens=MAX_TOKENS,
+            overlap=OVERLAP
+        )
+
+        for i, chunk in enumerate(section_chunks):
+            chunks.append({
+                "entity": entity,
+                "language": lang,
+                "section": section,
+                "chunk_id": i,
+                "text": chunk
+            })
+
+    return chunks
+
+# -------------------- MAIN --------------------
+
 def main():
-    files = sorted(RAW_DIR.glob("*.txt"))
-    for fp in tqdm(files, desc="Chunking"):
-        text = fp.read_text(encoding="utf-8", errors="ignore").strip()
-        if len(text) < 500:
-            # Trop court → inutile
+    files = list(CLEAN_DIR.glob("*.json"))
+
+    for path in tqdm(files, desc="Chunking cleaned data"):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        chunks = chunk_document(data)
+
+        if not chunks:
             continue
 
-        paras = split_paragraphs(text)
-        chunks = chunk_paragraphs(paras, max_chars=8000, overlap_paras=0)
-
-        # Nom base: Angelina_Jolie.fr
-        base = fp.stem  # ex: Angelina_Jolie.fr
-        for i, ch in enumerate(chunks, start=1):
-            out = CHUNK_DIR / f"{base}.chunk{i:03d}.txt"
-            out.write_text(ch, encoding="utf-8")
+        out_path = CHUNK_DIR / path.name
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(chunks, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     main()
