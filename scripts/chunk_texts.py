@@ -6,6 +6,34 @@ RAW_DIR = Path("data/raw")
 CHUNK_DIR = Path("data/chunks")
 CHUNK_DIR.mkdir(parents=True, exist_ok=True)
 
+TAIL_SECTION_MARKERS = {
+    "== see also ==",
+    "== external links ==",
+    "== notes et références ==",
+    "=== références ===",
+    "=== liens externes ===",
+}
+
+
+def strip_non_biographical_tail(text: str) -> str:
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    cut_idx = None
+    for i, line in enumerate(lines):
+        marker = line.strip().lower()
+        if marker in TAIL_SECTION_MARKERS:
+            cut_idx = i
+            break
+    if cut_idx is not None:
+        lines = lines[:cut_idx]
+
+    cleaned = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("Portail "):
+            continue
+        cleaned.append(line)
+    return "\n".join(cleaned).strip()
+
 def split_paragraphs(text: str) -> list[str]:
     text = text.replace("\r\n", "\n").strip()
     paras = [p.strip() for p in re.split(r"\n{2,}", text) if p.strip()]
@@ -50,6 +78,7 @@ def main():
     files = sorted(RAW_DIR.glob("*.txt"))
     for fp in tqdm(files, desc="Chunking"):
         text = fp.read_text(encoding="utf-8", errors="ignore").strip()
+        text = strip_non_biographical_tail(text)
         if len(text) < 500:
             # Trop court → inutile
             continue
