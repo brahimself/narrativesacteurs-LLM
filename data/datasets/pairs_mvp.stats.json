@@ -1,0 +1,13 @@
+{
+  "timelines_loaded": 497,
+  "positive_pairs": 248,
+  "negative_pairs": 744,
+  "total_pairs": 992,
+  "neg_multiplier": 3,
+  "max_events_used": 35,
+  "min_events_required": 5,
+  "langs": [
+    "en",
+    "fr"
+  ]
+}

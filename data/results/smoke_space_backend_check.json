@@ -1,0 +1,46 @@
+{
+  "created_at_utc": "2026-02-27T20:58:38Z",
+  "accepted": true,
+  "threshold": 0.4,
+  "max_tries": 1,
+  "attempts_count": 1,
+  "best_score": 0.906753420829773,
+  "accepted_attempt": 1,
+  "source": {
+    "entity": "Leonardo DiCaprio",
+    "lang": "en",
+    "source_file": "data\\processed\\Leonardo_DiCaprio.en.timeline.json",
+    "source_text": "1974: Born in Los Angeles, California | 1991: Debut in Critters 3 | 1993: Played Tobias Wolff in 'This Boy's Life' | 1993: Received critical acclaim and first Academy Award nomination for 'What's Eating Gilbert Grape' | 1993: Won National Board of Review Award | 1995: Star in The Quick and the Dead | 1996: Star in Romeo + Juliet | 1997: International stardom with Titanic. | 1997: Star in Titanic | 1998: Brief featured role in Woody Allen's Celebrity | 1998: Established the Leonardo DiCaprio Foundation in 1998. | 1999: Won a Golden Raspberry Award for Worst Screen Couple | 2000: Debut in Titanic | 2002: Received third Golden Globe nomination for performance in Catch Me If You Can"
+  },
+  "models": {
+    "generator_model": "Qwen/Qwen2.5-7B-Instruct",
+    "similarity_model": "sidbrahim/autotrain-NarraAnalogues15events",
+    "max_seq_length": null
+  },
+  "generation": {
+    "adaptation": "Conserver la progression et renforcer l'engagement humanitaire",
+    "temperature": 0.7,
+    "max_completion_tokens": 1400,
+    "max_events": 14
+  },
+  "best_attempt": {
+    "attempt": 1,
+    "score": 0.906753420829773,
+    "accepted": true,
+    "candidate_name": "Leo",
+    "candidate_narrative": "1974: Born in Los Angeles | 1989: Joined drama club in high school | 1993: Starred in 'This Boy's Life' | 1993: Won National Board of Review Award | 1995: Starred in 'The Quick and the Dead' | 1996: Featured in 'Romeo + Juliet' | 1997: Global fame with 'Titanic' | 1999: Best Supporting Actor Oscar for 'What's Eating Gilbert Grape' | 2000: Repeated success in 'Titanic' | 2002: Golden Globe nomination for 'Catch Me If You Can'",
+    "rationale": "Maintains the progression from early career to major achievements while emphasizing humanitarian efforts.",
+    "raw_response": "{\n    \"candidate_name\": \"Leo\",\n    \"candidate_narrative\": \"1974: Born in Los Angeles | 1989: Joined drama club in high school | 1993: Starred in 'This Boy's Life' | 1993: Won National Board of Review Award | 1995: Starred in 'The Quick and the Dead' | 1996: Featured in 'Romeo + Juliet' | 1997: Global fame with 'Titanic' | 1999: Best Supporting Actor Oscar for 'What's Eating Gilbert Grape' | 2000: Repeated success in 'Titanic' | 2002: Golden Globe nomination for 'Catch Me If You Can'\",\n    \"why_this_should_match\": \"Maintains the progression from early career to major achievements while emphasizing humanitarian efforts.\"\n}"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "score": 0.906753420829773,
+      "accepted": true,
+      "candidate_name": "Leo",
+      "candidate_narrative": "1974: Born in Los Angeles | 1989: Joined drama club in high school | 1993: Starred in 'This Boy's Life' | 1993: Won National Board of Review Award | 1995: Starred in 'The Quick and the Dead' | 1996: Featured in 'Romeo + Juliet' | 1997: Global fame with 'Titanic' | 1999: Best Supporting Actor Oscar for 'What's Eating Gilbert Grape' | 2000: Repeated success in 'Titanic' | 2002: Golden Globe nomination for 'Catch Me If You Can'",
+      "rationale": "Maintains the progression from early career to major achievements while emphasizing humanitarian efforts.",
+      "raw_response": "{\n    \"candidate_name\": \"Leo\",\n    \"candidate_narrative\": \"1974: Born in Los Angeles | 1989: Joined drama club in high school | 1993: Starred in 'This Boy's Life' | 1993: Won National Board of Review Award | 1995: Starred in 'The Quick and the Dead' | 1996: Featured in 'Romeo + Juliet' | 1997: Global fame with 'Titanic' | 1999: Best Supporting Actor Oscar for 'What's Eating Gilbert Grape' | 2000: Repeated success in 'Titanic' | 2002: Golden Globe nomination for 'Catch Me If You Can'\",\n    \"why_this_should_match\": \"Maintains the progression from early career to major achievements while emphasizing humanitarian efforts.\"\n}"
+    }
+  ]
+}

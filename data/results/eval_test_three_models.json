@@ -1,0 +1,77 @@
+[
+  {
+    "model_id": "sidbrahim/autotrain-NarraAnalogues15events",
+    "rows": 208,
+    "positives": 52,
+    "negatives": 156,
+    "score_mean_pos": 0.6835746765136719,
+    "score_mean_neg": 0.04316612333059311,
+    "score_median_pos": 0.7226115465164185,
+    "score_median_neg": 0.019951652735471725,
+    "auc_roc": 0.9908777120315582,
+    "average_precision": 0.9839195214897463,
+    "f1_at_0.5": 0.9387755102040816,
+    "precision_at_0.5": 1.0,
+    "recall_at_0.5": 0.8846153846153846,
+    "best_f1": 0.9803921568627451,
+    "best_threshold": 0.4059795260429382,
+    "best_precision": 1.0,
+    "best_recall": 0.9615384615384616,
+    "retrieval_en_fr": {
+      "entities": 26,
+      "recall@1": 0.9230769230769231,
+      "recall@5": 0.9615384615384616,
+      "mrr": 0.9478021978021978
+    }
+  },
+  {
+    "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "rows": 208,
+    "positives": 52,
+    "negatives": 156,
+    "score_mean_pos": 0.5005016922950745,
+    "score_mean_neg": 0.30274224281311035,
+    "score_median_pos": 0.50053870677948,
+    "score_median_neg": 0.2956560254096985,
+    "auc_roc": 0.9403353057199211,
+    "average_precision": 0.869287679086751,
+    "f1_at_0.5": 0.6582278481012659,
+    "precision_at_0.5": 0.9629629629629629,
+    "recall_at_0.5": 0.5,
+    "best_f1": 0.7755102040816326,
+    "best_threshold": 0.4475775883439928,
+    "best_precision": 0.8260869565217391,
+    "best_recall": 0.7307692307692307,
+    "retrieval_en_fr": {
+      "entities": 26,
+      "recall@1": 0.8461538461538461,
+      "recall@5": 0.9615384615384616,
+      "mrr": 0.8990384615384616
+    }
+  },
+  {
+    "model_id": "Jgmorenof/movie-plots-pt-en-all-MiniLM-L6-v2",
+    "rows": 208,
+    "positives": 52,
+    "negatives": 156,
+    "score_mean_pos": 0.49536019563674927,
+    "score_mean_neg": 0.1833442598581314,
+    "score_median_pos": 0.5249635577201843,
+    "score_median_neg": 0.16707034409046173,
+    "auc_roc": 0.9600591715976331,
+    "average_precision": 0.9151994619012255,
+    "f1_at_0.5": 0.761904761904762,
+    "precision_at_0.5": 1.0,
+    "recall_at_0.5": 0.6153846153846154,
+    "best_f1": 0.8484848484848485,
+    "best_threshold": 0.39250660937279463,
+    "best_precision": 0.8936170212765957,
+    "best_recall": 0.8076923076923077,
+    "retrieval_en_fr": {
+      "entities": 26,
+      "recall@1": 0.9615384615384616,
+      "recall@5": 0.9615384615384616,
+      "mrr": 0.967948717948718
+    }
+  }
+]

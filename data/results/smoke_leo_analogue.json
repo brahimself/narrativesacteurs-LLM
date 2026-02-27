@@ -1,0 +1,46 @@
+{
+  "created_at_utc": "2026-02-22T18:16:16Z",
+  "accepted": true,
+  "threshold": 0.4,
+  "max_tries": 1,
+  "attempts_count": 1,
+  "best_score": 0.5989656448364258,
+  "accepted_attempt": 1,
+  "source": {
+    "entity": "Leonardo DiCaprio",
+    "lang": "en",
+    "source_file": "data\\processed\\Leonardo_DiCaprio.en.timeline.json",
+    "source_text": "1974: Born in Los Angeles, California | 1991: Debut in Critters 3 | 1993: Played Tobias Wolff in 'This Boy's Life' | 1993: Received critical acclaim and first Academy Award nomination for 'What's Eating Gilbert Grape' | 1993: Won National Board of Review Award | 1995: Star in The Quick and the Dead | 1996: Star in Romeo + Juliet | 1997: International stardom with Titanic. | 1997: Star in Titanic | 1998: Brief featured role in Woody Allen's Celebrity | 1998: Established the Leonardo DiCaprio Foundation in 1998. | 1999: Won a Golden Raspberry Award for Worst Screen Couple | 2000: Debut in Titanic | 2002: Received third Golden Globe nomination for performance in Catch Me If You Can"
+  },
+  "models": {
+    "generator_model": "Qwen/Qwen2.5-7B-Instruct",
+    "similarity_model": "sidbrahim/autotrain-NarraAnalogues15events",
+    "max_seq_length": null
+  },
+  "generation": {
+    "adaptation": "Garder une trajectoire d'acteur mondial, mais orienter davantage vers engagement climatique et carrière européenne",
+    "temperature": 0.7,
+    "max_completion_tokens": 1400,
+    "max_events": 14
+  },
+  "best_attempt": {
+    "attempt": 1,
+    "score": 0.5989656448364258,
+    "accepted": true,
+    "candidate_name": "Leo",
+    "candidate_narrative": "1981: Born in Los Angeles, California | 1997: Joined European theater in 'The Merchant of Venice' | 1999: Won the Molière Award for 'The Taming of the Shrew' | 2000: Starred in 'Titanic', leading to global fame | 2002: Received third César nomination for 'Catch Me If You Can' | 2003: Founded the Leonardo DiCaprio Foundation to promote environmental causes | 2004: Featured in 'Blood Diamond', highlighting human rights issues | 2005: Began to focus more on climate change advocacy | 2008: Received a BAFTA nomination for 'Revolutionary Road'",
+    "rationale": "Maintains global trajectory with increased focus on climate advocacy and European engagements.",
+    "raw_response": "{\n  \"candidate_name\": \"Leo\",\n  \"candidate_narrative\": \"1981: Born in Los Angeles, California | 1997: Joined European theater in 'The Merchant of Venice' | 1999: Won the Molière Award for 'The Taming of the Shrew' | 2000: Starred in 'Titanic', leading to global fame | 2002: Received third César nomination for 'Catch Me If You Can' | 2003: Founded the Leonardo DiCaprio Foundation to promote environmental causes | 2004: Featured in 'Blood Diamond', highlighting human rights issues | 2005: Began to focus more on climate change advocacy | 2008: Received a BAFTA nomination for 'Revolutionary Road'\",\n  \"why_this_should_match\": \"Maintains global trajectory with increased focus on climate advocacy and European engagements.\"\n}"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "score": 0.5989656448364258,
+      "accepted": true,
+      "candidate_name": "Leo",
+      "candidate_narrative": "1981: Born in Los Angeles, California | 1997: Joined European theater in 'The Merchant of Venice' | 1999: Won the Molière Award for 'The Taming of the Shrew' | 2000: Starred in 'Titanic', leading to global fame | 2002: Received third César nomination for 'Catch Me If You Can' | 2003: Founded the Leonardo DiCaprio Foundation to promote environmental causes | 2004: Featured in 'Blood Diamond', highlighting human rights issues | 2005: Began to focus more on climate change advocacy | 2008: Received a BAFTA nomination for 'Revolutionary Road'",
+      "rationale": "Maintains global trajectory with increased focus on climate advocacy and European engagements.",
+      "raw_response": "{\n  \"candidate_name\": \"Leo\",\n  \"candidate_narrative\": \"1981: Born in Los Angeles, California | 1997: Joined European theater in 'The Merchant of Venice' | 1999: Won the Molière Award for 'The Taming of the Shrew' | 2000: Starred in 'Titanic', leading to global fame | 2002: Received third César nomination for 'Catch Me If You Can' | 2003: Founded the Leonardo DiCaprio Foundation to promote environmental causes | 2004: Featured in 'Blood Diamond', highlighting human rights issues | 2005: Began to focus more on climate change advocacy | 2008: Received a BAFTA nomination for 'Revolutionary Road'\",\n  \"why_this_should_match\": \"Maintains global trajectory with increased focus on climate advocacy and European engagements.\"\n}"
+    }
+  ]
+}

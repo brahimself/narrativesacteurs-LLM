@@ -1,0 +1,55 @@
+{
+  "created_at_utc": "2026-02-22T18:17:14Z",
+  "accepted": false,
+  "threshold": 0.85,
+  "max_tries": 2,
+  "attempts_count": 2,
+  "best_score": 0.5002651214599609,
+  "accepted_attempt": null,
+  "source": {
+    "entity": "Leonardo DiCaprio",
+    "lang": "en",
+    "source_file": "data\\processed\\Leonardo_DiCaprio.en.timeline.json",
+    "source_text": "1974: Born in Los Angeles, California | 1991: Debut in Critters 3 | 1993: Played Tobias Wolff in 'This Boy's Life' | 1993: Received critical acclaim and first Academy Award nomination for 'What's Eating Gilbert Grape' | 1993: Won National Board of Review Award | 1995: Star in The Quick and the Dead | 1996: Star in Romeo + Juliet | 1997: International stardom with Titanic. | 1997: Star in Titanic | 1998: Brief featured role in Woody Allen's Celebrity | 1998: Established the Leonardo DiCaprio Foundation in 1998. | 1999: Won a Golden Raspberry Award for Worst Screen Couple | 2000: Debut in Titanic | 2002: Received third Golden Globe nomination for performance in Catch Me If You Can"
+  },
+  "models": {
+    "generator_model": "Qwen/Qwen2.5-7B-Instruct",
+    "similarity_model": "sidbrahim/autotrain-NarraAnalogues15events",
+    "max_seq_length": null
+  },
+  "generation": {
+    "adaptation": "Conserver la progression de carrière mais déplacer la majorité des jalons en Europe francophone",
+    "temperature": 0.7,
+    "max_completion_tokens": 1400,
+    "max_events": 14
+  },
+  "best_attempt": {
+    "attempt": 2,
+    "score": 0.5002651214599609,
+    "accepted": false,
+    "candidate_name": "Louis-David Thibault",
+    "candidate_narrative": "1974: Born in Montreal, Quebec | 1990: Debut in Les Opérations Pélican | 1991: Star in Les Miserables | 1992: Won Magritte Award for 'Le Chant du Lion' | 1993: Played Jean Valjean in 'Les Misérables' | 1994: Won César Award for 'Les Dents du Tigre' | 1995: Star in 'Titanic' | 1996: Star in 'Romeo et Juliette' | 1997: International stardom with 'Titanic' | 1997: Star in 'Titanic' | 1998: Won a César Award for 'L'Étrangère' | 1999: Won a César Award for 'La Citadelle'",
+    "rationale": "Maintains career progression and key milestones in a French-speaking environment.",
+    "raw_response": "{\n    \"candidate_name\": \"Louis-David Thibault\",\n    \"candidate_narrative\": \"1974: Born in Montreal, Quebec | 1990: Debut in Les Opérations Pélican | 1991: Star in Les Miserables | 1992: Won Magritte Award for 'Le Chant du Lion' | 1993: Played Jean Valjean in 'Les Misérables' | 1994: Won César Award for 'Les Dents du Tigre' | 1995: Star in 'Titanic' | 1996: Star in 'Romeo et Juliette' | 1997: International stardom with 'Titanic' | 1997: Star in 'Titanic' | 1998: Won a César Award for 'L'Étrangère' | 1999: Won a César Award for 'La Citadelle'\",\n    \"why_this_should_match\": \"Maintains career progression and key milestones in a French-speaking environment.\"\n}"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "score": 0.4290766716003418,
+      "accepted": false,
+      "candidate_name": "Leonardo DiCaprio in Europe",
+      "candidate_narrative": "1974: Born in Montreal, Quebec | 1991: Debut in Critters 3 | 1993: Played Jean-Baptiste Grenouille in 'Perfume' | 1994: Won César Award for '芳名卡特琳娜' | 1995: Star in '芳名卡特琳娜' | 1996: Star in '泰坦尼克号' | 1997: Won César Award for '芳名卡特琳娜' | 1998: Star in '无间道风云' | 1998: Established the Leonardo DiCaprio Foundation in 1998 | 1999: Won a César Award for '天使之城'",
+      "rationale": "Maintains career progression with major milestones in a European francophone context.",
+      "raw_response": "{\n  \"candidate_name\": \"Leonardo DiCaprio in Europe\",\n  \"candidate_narrative\": \"1974: Born in Montreal, Quebec | 1991: Debut in Critters 3 | 1993: Played Jean-Baptiste Grenouille in 'Perfume' | 1994: Won César Award for '芳名卡特琳娜' | 1995: Star in '芳名卡特琳娜' | 1996: Star in '泰坦尼克号' | 1997: Won César Award for '芳名卡特琳娜' | 1998: Star in '无间道风云' | 1998: Established the Leonardo DiCaprio Foundation in 1998 | 1999: Won a César Award for '天使之城'\",\n  \"why_this_should_match\": \"Maintains career progression with major milestones in a European francophone context.\"\n}"
+    },
+    {
+      "attempt": 2,
+      "score": 0.5002651214599609,
+      "accepted": false,
+      "candidate_name": "Louis-David Thibault",
+      "candidate_narrative": "1974: Born in Montreal, Quebec | 1990: Debut in Les Opérations Pélican | 1991: Star in Les Miserables | 1992: Won Magritte Award for 'Le Chant du Lion' | 1993: Played Jean Valjean in 'Les Misérables' | 1994: Won César Award for 'Les Dents du Tigre' | 1995: Star in 'Titanic' | 1996: Star in 'Romeo et Juliette' | 1997: International stardom with 'Titanic' | 1997: Star in 'Titanic' | 1998: Won a César Award for 'L'Étrangère' | 1999: Won a César Award for 'La Citadelle'",
+      "rationale": "Maintains career progression and key milestones in a French-speaking environment.",
+      "raw_response": "{\n    \"candidate_name\": \"Louis-David Thibault\",\n    \"candidate_narrative\": \"1974: Born in Montreal, Quebec | 1990: Debut in Les Opérations Pélican | 1991: Star in Les Miserables | 1992: Won Magritte Award for 'Le Chant du Lion' | 1993: Played Jean Valjean in 'Les Misérables' | 1994: Won César Award for 'Les Dents du Tigre' | 1995: Star in 'Titanic' | 1996: Star in 'Romeo et Juliette' | 1997: International stardom with 'Titanic' | 1997: Star in 'Titanic' | 1998: Won a César Award for 'L'Étrangère' | 1999: Won a César Award for 'La Citadelle'\",\n    \"why_this_should_match\": \"Maintains career progression and key milestones in a French-speaking environment.\"\n}"
+    }
+  ]
+}
