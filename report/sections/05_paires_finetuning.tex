@@ -1,0 +1,35 @@
+﻿\chapter{Paires Supervisees et Fine-tuning}
+
+\section{Construction des paires}
+Le dataset de similarite final est construit sur des paires
+\texttt{en <-> fr\_en} de la meme entite.
+\begin{itemize}[leftmargin=2em]
+  \item Positifs: meme entite, langues \texttt{en} et \texttt{fr\_en}.
+  \item Negatifs: entites differentes (hard negatives + random negatives).
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Split du dataset de paires \texttt{en <-> fr\_en} (hard final)}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Split & Lignes & Positifs & Negatifs & Entites \\
+    \midrule
+    Train & 1592 & 398 & 1194 & 199 \\
+    Validation & 192 & 48 & 144 & 24 \\
+    Test & 208 & 52 & 156 & 26 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Modeles compares}
+\begin{itemize}[leftmargin=2em]
+  \item Baseline non fine-tunee: \texttt{sentence-transformers/all-MiniLM-L6-v2}
+  \item Fine-tune 1: \texttt{sidbrahim/narrativesAnalogues-allMiniLM}
+  \item Fine-tune 2: \texttt{sidbrahim/narrativesAnalogues-MPNet}
+\end{itemize}
+
+\section{Objectif du fine-tuning}
+L'objectif est d'ameliorer la separation entre paires analogues et non analogues,
+en particulier sur les cas difficiles. La comparaison baseline vs modeles
+fine-tunes permet de mesurer le gain reel de l'apprentissage supervise.

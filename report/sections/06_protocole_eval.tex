@@ -1,0 +1,31 @@
+\chapter{Protocole d'Évaluation}
+
+\section{Métriques}
+Deux familles de métriques sont utilisées:
+\begin{itemize}[leftmargin=2em]
+  \item sans seuil: \texttt{AUC-ROC}, \texttt{Average Precision (AP)},
+  \item avec seuil: \texttt{Precision}, \texttt{Recall}, \texttt{F1}.
+\end{itemize}
+
+\section{Rôle du seuil}
+Chaque paire reçoit un score cosinus. La décision binaire suit:
+\[
+\text{match} \iff score \ge \tau
+\]
+où \(\tau\) est le seuil.
+
+Deux lectures sont reportées:
+\begin{itemize}[leftmargin=2em]
+  \item \(\tau=0.5\): comparaison équitable et simple en déploiement,
+  \item \(\tau=\tau^*\): meilleur seuil observé (\texttt{best\_threshold}).
+\end{itemize}
+
+\section{Jeux d'évaluation}
+\begin{itemize}[leftmargin=2em]
+  \item Validation
+  \item Test
+  \item Hard test (négatifs proches sémantiquement)
+\end{itemize}
+
+Le split hard est utilisé pour tester la robustesse aux faux positifs.
+

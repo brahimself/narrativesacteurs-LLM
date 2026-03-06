@@ -2,7 +2,7 @@ import argparse
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -97,58 +97,94 @@ def prf1(labels: np.ndarray, preds: np.ndarray) -> Dict[str, float]:
     tp = int(((labels == 1) & (preds == 1)).sum())
     fp = int(((labels == 0) & (preds == 1)).sum())
     fn = int(((labels == 1) & (preds == 0)).sum())
+    tn = int(((labels == 0) & (preds == 0)).sum())
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+    accuracy = (tp + tn) / len(labels) if len(labels) else 0.0
     return {
         "precision": precision,
         "recall": recall,
         "f1": f1,
+        "accuracy": accuracy,
         "tp": tp,
         "fp": fp,
         "fn": fn,
+        "tn": tn,
     }
 
 
 def best_f1_threshold(labels: np.ndarray, scores: np.ndarray) -> Dict[str, float]:
-    thresholds = np.linspace(float(scores.min()), float(scores.max()), 401)
+    unique_thresholds = np.unique(scores)
+    if len(unique_thresholds) > 3000:
+        thresholds = np.linspace(float(scores.min()), float(scores.max()), 1001)
+    else:
+        thresholds = unique_thresholds
+
     best = {
         "f1": -1.0,
         "threshold": 0.0,
         "precision": 0.0,
         "recall": 0.0,
+        "accuracy": 0.0,
         "tp": 0,
         "fp": 0,
         "fn": 0,
+        "tn": 0,
     }
-    for t in thresholds:
-        preds = (scores >= t).astype(int)
-        m = prf1(labels, preds)
-        if m["f1"] > best["f1"]:
+    for threshold in thresholds:
+        preds = (scores >= threshold).astype(int)
+        metrics = prf1(labels, preds)
+        if metrics["f1"] > best["f1"]:
             best = {
-                "f1": m["f1"],
-                "threshold": float(t),
-                "precision": m["precision"],
-                "recall": m["recall"],
-                "tp": m["tp"],
-                "fp": m["fp"],
-                "fn": m["fn"],
+                "f1": metrics["f1"],
+                "threshold": float(threshold),
+                "precision": metrics["precision"],
+                "recall": metrics["recall"],
+                "accuracy": metrics["accuracy"],
+                "tp": metrics["tp"],
+                "fp": metrics["fp"],
+                "fn": metrics["fn"],
+                "tn": metrics["tn"],
             }
     return best
 
 
-def retrieval_en_fr(
+def encode_similarity_scores(
     model: SentenceTransformer,
     examples: List[Example],
+    batch_size: int,
+) -> Tuple[np.ndarray, np.ndarray]:
+    sentence1 = [x.sentence1 for x in examples]
+    sentence2 = [x.sentence2 for x in examples]
+    labels = np.asarray([x.label for x in examples], dtype=int)
+
+    emb1 = model.encode(
+        sentence1,
+        normalize_embeddings=True,
+        batch_size=batch_size,
+        show_progress_bar=False,
+    )
+    emb2 = model.encode(
+        sentence2,
+        normalize_embeddings=True,
+        batch_size=batch_size,
+        show_progress_bar=False,
+    )
+    scores = np.sum(emb1 * emb2, axis=1)
+    return labels, scores
+
+
+def retrieval_crossling(
+    model: SentenceTransformer,
+    examples: List[Example],
+    query_lang: str,
+    candidate_lang: str,
     batch_size: int,
 ) -> Optional[Dict[str, float]]:
     positives = [
         x for x in examples
-        if x.label == 1
-        and x.lang_a == "en"
-        and x.lang_b == "fr"
-        and x.entity_a
-        and x.entity_a == x.entity_b
+        if x.label == 1 and x.entity_a and x.entity_a == x.entity_b
     ]
     if not positives:
         return None
@@ -156,10 +192,12 @@ def retrieval_en_fr(
     query_by_entity: Dict[str, str] = {}
     cand_by_entity: Dict[str, str] = {}
     for x in positives:
-        if x.entity_a not in query_by_entity:
-            query_by_entity[x.entity_a] = x.sentence1
-        if x.entity_b not in cand_by_entity:
-            cand_by_entity[x.entity_b] = x.sentence2
+        if x.lang_a == query_lang and x.lang_b == candidate_lang:
+            query_by_entity.setdefault(x.entity_a, x.sentence1)
+            cand_by_entity.setdefault(x.entity_b, x.sentence2)
+        elif x.lang_a == candidate_lang and x.lang_b == query_lang:
+            query_by_entity.setdefault(x.entity_b, x.sentence2)
+            cand_by_entity.setdefault(x.entity_a, x.sentence1)
 
     entities = sorted(set(query_by_entity.keys()) & set(cand_by_entity.keys()))
     if len(entities) < 2:
@@ -189,6 +227,8 @@ def retrieval_en_fr(
 
     ranks_arr = np.asarray(ranks)
     return {
+        "query_lang": query_lang,
+        "candidate_lang": candidate_lang,
         "entities": len(entities),
         "recall@1": float((ranks_arr <= 1).mean()),
         "recall@5": float((ranks_arr <= 5).mean()),
@@ -196,44 +236,23 @@ def retrieval_en_fr(
     }
 
 
-def evaluate_model(
+def evaluate_from_scores(
     model_id: str,
-    examples: List[Example],
-    batch_size: int,
-    max_seq_length: Optional[int],
+    labels: np.ndarray,
+    scores: np.ndarray,
+    selected_threshold: float,
+    retrieval_report: Optional[Dict[str, float]],
 ) -> Dict:
-    model = SentenceTransformer(model_id)
-    if max_seq_length is not None:
-        model.max_seq_length = max_seq_length
-
-    s1 = [x.sentence1 for x in examples]
-    s2 = [x.sentence2 for x in examples]
-    labels = np.asarray([x.label for x in examples], dtype=int)
-
-    emb1 = model.encode(
-        s1,
-        normalize_embeddings=True,
-        batch_size=batch_size,
-        show_progress_bar=False,
-    )
-    emb2 = model.encode(
-        s2,
-        normalize_embeddings=True,
-        batch_size=batch_size,
-        show_progress_bar=False,
-    )
-    scores = np.sum(emb1 * emb2, axis=1)
-
     score_pos = scores[labels == 1]
     score_neg = scores[labels == 0]
 
     metrics_05 = prf1(labels, (scores >= 0.5).astype(int))
     best = best_f1_threshold(labels, scores)
-    retrieval = retrieval_en_fr(model, examples, batch_size=batch_size)
+    selected_metrics = prf1(labels, (scores >= selected_threshold).astype(int))
 
     return {
         "model_id": model_id,
-        "rows": len(examples),
+        "rows": int(len(labels)),
         "positives": int((labels == 1).sum()),
         "negatives": int((labels == 0).sum()),
         "score_mean_pos": float(score_pos.mean()) if len(score_pos) else float("nan"),
@@ -242,14 +261,13 @@ def evaluate_model(
         "score_median_neg": float(np.median(score_neg)) if len(score_neg) else float("nan"),
         "auc_roc": auc_roc(labels, scores),
         "average_precision": average_precision(labels, scores),
-        "f1_at_0.5": metrics_05["f1"],
-        "precision_at_0.5": metrics_05["precision"],
-        "recall_at_0.5": metrics_05["recall"],
-        "best_f1": best["f1"],
-        "best_threshold": best["threshold"],
-        "best_precision": best["precision"],
-        "best_recall": best["recall"],
-        "retrieval_en_fr": retrieval,
+        "metrics_at_0_5": metrics_05,
+        "metrics_at_selected_threshold": {
+            "threshold": float(selected_threshold),
+            **selected_metrics,
+        },
+        "best_f1_on_eval": best,
+        "retrieval": retrieval_report,
     }
 
 
@@ -274,31 +292,49 @@ def print_report(report: Dict) -> None:
             report["average_precision"],
         )
     )
+
+    m05 = report["metrics_at_0_5"]
     print(
-        "f1@0.5={:.4f} precision@0.5={:.4f} recall@0.5={:.4f}".format(
-            report["f1_at_0.5"],
-            report["precision_at_0.5"],
-            report["recall_at_0.5"],
-        )
-    )
-    print(
-        "best_f1={:.4f} at_threshold={:.4f} (precision={:.4f}, recall={:.4f})".format(
-            report["best_f1"],
-            report["best_threshold"],
-            report["best_precision"],
-            report["best_recall"],
+        "@0.5 -> acc={:.4f} f1={:.4f} precision={:.4f} recall={:.4f}".format(
+            m05["accuracy"],
+            m05["f1"],
+            m05["precision"],
+            m05["recall"],
         )
     )
 
-    retrieval = report.get("retrieval_en_fr")
+    msel = report["metrics_at_selected_threshold"]
+    print(
+        "@selected(t={:.4f}) -> acc={:.4f} f1={:.4f} precision={:.4f} recall={:.4f}".format(
+            msel["threshold"],
+            msel["accuracy"],
+            msel["f1"],
+            msel["precision"],
+            msel["recall"],
+        )
+    )
+
+    best = report["best_f1_on_eval"]
+    print(
+        "best_on_eval -> t={:.4f} acc={:.4f} f1={:.4f} precision={:.4f} recall={:.4f}".format(
+            best["threshold"],
+            best["accuracy"],
+            best["f1"],
+            best["precision"],
+            best["recall"],
+        )
+    )
+
+    retrieval = report.get("retrieval")
     if retrieval:
         print(
-            "retrieval en->fr: entities={entities} recall@1={recall@1:.4f} recall@5={recall@5:.4f} mrr={mrr:.4f}".format(
+            "retrieval {query_lang}->{candidate_lang}: entities={entities} recall@1={recall@1:.4f} recall@5={recall@5:.4f} mrr={mrr:.4f}".format(
                 **retrieval
             )
         )
     else:
-        print("retrieval en->fr: not available (missing required positive pairs).")
+        print("retrieval: not available for requested language direction.")
+
 
 
 def main() -> None:
@@ -307,7 +343,13 @@ def main() -> None:
         "--data",
         type=Path,
         default=Path("data/datasets/autotrain_pair_score/test.jsonl"),
-        help="JSONL dataset with sentence1/sentence2/score or text_a/text_b/label.",
+        help="Evaluation JSONL dataset with sentence1/sentence2/score or text_a/text_b/label.",
+    )
+    parser.add_argument(
+        "--validation-data",
+        type=Path,
+        default=None,
+        help="Optional validation JSONL. If provided, threshold is selected on validation best-F1 then applied to --data.",
     )
     parser.add_argument(
         "--models",
@@ -317,26 +359,94 @@ def main() -> None:
     )
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--max-seq-length", type=int, default=None)
+    parser.add_argument("--retrieval-query-lang", type=str, default="en")
+    parser.add_argument("--retrieval-candidate-lang", type=str, default="fr_en")
     parser.add_argument("--out-json", type=Path, default=None)
     args = parser.parse_args()
 
     if not args.data.exists():
         raise SystemExit(f"Dataset not found: {args.data}")
+    if args.validation_data is not None and not args.validation_data.exists():
+        raise SystemExit(f"Validation dataset not found: {args.validation_data}")
 
-    examples = read_examples(args.data)
-    if not examples:
+    eval_examples = read_examples(args.data)
+    if not eval_examples:
         raise SystemExit(f"No valid rows found in {args.data}")
+
+    validation_examples: Optional[List[Example]] = None
+    if args.validation_data is not None:
+        validation_examples = read_examples(args.validation_data)
+        if not validation_examples:
+            raise SystemExit(f"No valid rows found in {args.validation_data}")
 
     reports: List[Dict] = []
     for model_id in args.models:
-        report = evaluate_model(
-            model_id=model_id,
-            examples=examples,
+        model = SentenceTransformer(model_id)
+        if args.max_seq_length is not None:
+            model.max_seq_length = args.max_seq_length
+
+        selected_threshold = 0.5
+        validation_report = None
+        if validation_examples is not None:
+            val_labels, val_scores = encode_similarity_scores(
+                model=model,
+                examples=validation_examples,
+                batch_size=args.batch_size,
+            )
+            val_best = best_f1_threshold(val_labels, val_scores)
+            selected_threshold = float(val_best["threshold"])
+            val_at_05 = prf1(val_labels, (val_scores >= 0.5).astype(int))
+            val_at_sel = prf1(val_labels, (val_scores >= selected_threshold).astype(int))
+            validation_report = {
+                "rows": int(len(val_labels)),
+                "best_f1": val_best,
+                "metrics_at_0_5": val_at_05,
+                "metrics_at_selected_threshold": {
+                    "threshold": selected_threshold,
+                    **val_at_sel,
+                },
+            }
+
+        eval_labels, eval_scores = encode_similarity_scores(
+            model=model,
+            examples=eval_examples,
             batch_size=args.batch_size,
-            max_seq_length=args.max_seq_length,
         )
+        retrieval_report = retrieval_crossling(
+            model=model,
+            examples=eval_examples,
+            query_lang=args.retrieval_query_lang,
+            candidate_lang=args.retrieval_candidate_lang,
+            batch_size=args.batch_size,
+        )
+
+        report = evaluate_from_scores(
+            model_id=model_id,
+            labels=eval_labels,
+            scores=eval_scores,
+            selected_threshold=selected_threshold,
+            retrieval_report=retrieval_report,
+        )
+        report["selection"] = {
+            "selected_threshold_source": "validation_best_f1" if validation_report else "fixed_0.5",
+            "selected_threshold": selected_threshold,
+        }
+        if validation_report is not None:
+            report["validation"] = validation_report
+
         reports.append(report)
         print_report(report)
+
+        if validation_report is not None:
+            print(
+                "validation -> @0.5 acc={:.4f} f1={:.4f}, @selected(t={:.4f}) acc={:.4f} f1={:.4f}".format(
+                    validation_report["metrics_at_0_5"]["accuracy"],
+                    validation_report["metrics_at_0_5"]["f1"],
+                    validation_report["metrics_at_selected_threshold"]["threshold"],
+                    validation_report["metrics_at_selected_threshold"]["accuracy"],
+                    validation_report["metrics_at_selected_threshold"]["f1"],
+                )
+            )
 
     if args.out_json is not None:
         args.out_json.parent.mkdir(parents=True, exist_ok=True)
@@ -346,4 +456,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

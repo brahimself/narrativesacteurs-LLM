@@ -1,0 +1,27 @@
+﻿\chapter{Conclusion et Perspectives}
+
+Ce projet livre une chaine complete de generation de narratives analogues,
+depuis des textes Wikipedia bruts jusqu'a une application interactive deployable.
+La branche \texttt{merge -> final\_en} a ete implementee (249 entites), mais les
+resultats quantitatifs de similarite retenus dans ce rapport proviennent du
+pipeline \texttt{en <-> fr\_en}.
+
+La comparaison experimentale montre:
+\begin{itemize}[leftmargin=2em]
+  \item un gain net du fine-tuning face a la baseline non fine-tunee,
+  \item une robustesse forte des modeles fine-tunes sur hard negatives,
+  \item un compromis modele/seuil a expliciter selon le mode de deploiement.
+\end{itemize}
+
+Recommandation pratique:
+\begin{itemize}[leftmargin=2em]
+  \item usage recommande (meilleur score global): MPNet fine-tune avec seuil calibre (\(\approx 0.46\)),
+  \item alternative plus legere: allMiniLM fine-tune avec seuil recommande (\(\approx 0.28\)).
+\end{itemize}
+
+Travaux futurs:
+\begin{itemize}[leftmargin=2em]
+  \item calibrage automatique du seuil selon la distribution de scores,
+  \item extension a d'autres domaines (films, livres),
+  \item evaluation humaine plus large de la qualite narrative.
+\end{itemize}

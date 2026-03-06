@@ -1,0 +1,33 @@
+\chapter{Application Hugging Face Spaces}
+
+\section{Objectif}
+L'application fournit une interface utilisateur pour generer des narratives analogues
+de maniere controlee.
+
+\section{Fonctionnement}
+L'utilisateur selectionne:
+\begin{itemize}[leftmargin=2em]
+  \item une entite source,
+  \item une langue source,
+  \item une instruction d'adaptation,
+  \item un seuil de similarite,
+  \item un modele de similarite (allMiniLM FT, MPNET FT, ou custom).
+\end{itemize}
+
+Pour chaque tentative:
+\begin{enumerate}[leftmargin=2em]
+  \item le LLM genere un candidat narratif,
+  \item le sentence-encoder calcule la similarite avec la source,
+  \item si \(score < seuil\), le systeme relance une tentative en tenant compte
+  de l'historique des echecs.
+\end{enumerate}
+
+\section{Sorties affichees dans l'UI}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Run Summary}: accepted, best score, nombre de tentatives, tentative acceptee;
+  \item \textbf{Best Candidate Narrative}: meilleur narratif retenu;
+  \item \textbf{Attempts}: tableau minimal avec \texttt{attempt}, \texttt{score}, \texttt{accepted};
+  \item \textbf{Full Result JSON}: sortie complete pour audit/reproductibilite;
+  \item \textbf{Execution Logs}: traces d'execution.
+\end{itemize}
+

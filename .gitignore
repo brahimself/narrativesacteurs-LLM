@@ -7,5 +7,6 @@ data/raw/
 data/chunks/
 data/processed/
 data/pairs/
+data
 
 .env

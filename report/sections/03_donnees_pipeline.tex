@@ -1,0 +1,47 @@
+﻿\chapter{Donnees et Pipeline}
+
+\section{Vue d'ensemble}
+Le pipeline retenu pour les resultats finaux suit les etapes suivantes:
+\begin{enumerate}[leftmargin=2em]
+  \item collecte Wikipedia (\texttt{scripts/wiki\_fetch.py}),
+  \item chunking des textes longs (\texttt{scripts/chunk\_texts.py}),
+  \item extraction timeline par LLM (\texttt{scripts/extract\_timelines.py}),
+  \item traduction FR->EN des timelines FR, sauvegardees en \texttt{*.fr\_en.timeline.json}
+        (\texttt{scripts/translate\_fr\_timelines\_to\_en.py}),
+  \item construction des paires \texttt{en <-> fr\_en}
+        (\texttt{scripts/make\_pairs.py}, \texttt{scripts/build\_pairs\_autotrain.py}),
+  \item fine-tuning et evaluation similarite (\texttt{scripts/eval\_similarity.py}),
+  \item generation controlee (\texttt{scripts/generate\_analogues.py}) et UI (\texttt{app.py}).
+\end{enumerate}
+
+Une branche complementaire \texttt{merge -> final\_en} existe egalement
+(\texttt{scripts/merge\_multilingual\_timelines.py},
+\texttt{scripts/finalize\_monolingual\_en\_timelines.py}),
+mais elle n'est pas la base des scores finaux reportes.
+
+\section{Statistiques principales (pipeline retenu)}
+\begin{table}[H]
+  \centering
+  \caption{Statistiques de la branche \texttt{en/fr\_en} retenue}
+  \begin{tabular}{lr}
+    \toprule
+    Indicateur & Valeur \\
+    \midrule
+    Timelines \texttt{en} disponibles & 249 \\
+    Timelines \texttt{fr\_en} disponibles & 249 \\
+    Entites retenues pour paires \texttt{en <-> fr\_en} & 248 \\
+    Paires positives & 248 \\
+    Paires negatives & 744 \\
+    Total paires & 992 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Les statistiques proviennent de:
+\texttt{data/datasets/fr\_en\_timelines.stats.json} et
+\texttt{data/datasets/pairs\_en\_fr\_en\_mvp.stats.json}.
+
+\section{Gestion du contexte long}
+Le chunking decoupe les biographies en segments coherents, avec nettoyage des
+sections peu utiles (references, liens externes, etc.). Cette strategie reduit
+les erreurs de parsing et ameliore la couverture factuelle sur les textes longs.

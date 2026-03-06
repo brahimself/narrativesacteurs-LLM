@@ -17,7 +17,7 @@ load_dotenv(find_dotenv(usecwd=True), override=True)
 
 DEFAULT_TIMELINE_DIR = Path("data/processed")
 DEFAULT_OUTPUT_DIR = Path("data/results")
-DEFAULT_SIMILARITY_MODEL = "sidbrahim/autotrain-NarraAnalogues15events"
+DEFAULT_SIMILARITY_MODEL = "sidbrahim/narrativesAnalogues-MPNet"
 DEFAULT_GENERATOR_MODEL = os.getenv("MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
 DEFAULT_MAX_COMPLETION_TOKENS = int(os.getenv("MAX_COMPLETION_TOKENS", "1400"))
 DEFAULT_BILL_TO = os.getenv("BILL_TO", "IAFA-UT")
@@ -346,7 +346,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--generator-model", type=str, default=DEFAULT_GENERATOR_MODEL)
     parser.add_argument("--similarity-model", type=str, default=DEFAULT_SIMILARITY_MODEL)
-    parser.add_argument("--threshold", type=float, default=0.40)
+    parser.add_argument("--threshold", type=float, default=0.46)
     parser.add_argument("--max-tries", type=int, default=5)
     parser.add_argument("--max-events", type=int, default=14)
     parser.add_argument("--max-source-chars", type=int, default=3500)

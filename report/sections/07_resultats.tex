@@ -1,0 +1,142 @@
+\chapter{Resultats}
+
+\section{Protocole de lecture}
+Les resultats ci-dessous sont calcules sur le split final
+\texttt{autotrain\_pair\_score\_en\_fr\_en\_hard\_final}
+(\(N_{test}=208\), \(52\) positifs, \(156\) negatifs).
+
+Le seuil operationnel est selectionne sur validation (best F1), puis applique tel quel sur test.
+
+\section{Validation (selection du seuil)}
+\begin{table}[H]
+  \centering
+  \caption{Validation: F1 a seuil fixe et F1 au seuil selectionne}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Modele & F1@0.5 & Seuil selectionne & F1@seuil & Acc@seuil \\
+    \midrule
+    MiniLM baseline & 0.7640 & 0.4829 & 0.8333 & 0.9167 \\
+    allMiniLM fine-tune & 0.8293 & 0.2847 & 0.8980 & 0.9479 \\
+    MPNet baseline & 0.4638 & 0.6902 & 0.6838 & 0.8073 \\
+    MPNet fine-tune & 0.9091 & 0.4632 & 0.9333 & 0.9688 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Test (evaluation finale)}
+\begin{table}[H]
+  \centering
+  \caption{Test: comparaison finale (seuil choisi sur validation)}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Modele & F1@0.5 & F1@seuil & Acc@seuil & Seuil & Recall@1 \\
+    \midrule
+    MiniLM baseline & 0.8224 & 0.7931 & 0.8846 & 0.4829 & 0.9615 \\
+    allMiniLM fine-tune & 0.8936 & 0.9434 & 0.9712 & 0.2847 & 0.9615 \\
+    MPNet baseline & 0.4602 & 0.7934 & 0.8798 & 0.6902 & 0.7692 \\
+    MPNet fine-tune & 0.9615 & 0.9811 & 0.9904 & 0.4632 & 1.0000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Dynamique d'entrainement (courbes loss)}
+Les courbes \texttt{train/loss} et \texttt{eval/loss} observees dans TensorBoard
+montrent que les deux fine-tunings convergent:
+\begin{itemize}[leftmargin=2em]
+  \item la perte d'entrainement diminue fortement pour allMiniLM et MPNet;
+  \item la perte de validation diminue egalement, sans remontee nette en fin d'entrainement.
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Lecture des courbes d'entrainement (fin de run)}
+  \begin{tabular}{lrr}
+    \toprule
+    Modele & train/loss (fin) & eval/loss (fin) \\
+    \midrule
+    allMiniLM fine-tune & 0.0399 & 2.7676 \\
+    MPNet fine-tune & 0.0003 & 1.0842 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Les captures d'ecran TensorBoard peuvent etre placees dans:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{report/figures/training/mpnet\_eval\_loss.png}
+  \item \texttt{report/figures/training/mpnet\_train\_loss.png}
+  \item \texttt{report/figures/training/allminilm\_eval\_loss.png}
+  \item \texttt{report/figures/training/allminilm\_train\_loss.png}
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \IfFileExists{figures/training/mpnet_eval_loss.png}{
+      \includegraphics[width=\linewidth]{figures/training/mpnet_eval_loss.png}
+    }{
+      \fbox{\parbox[c][4cm][c]{0.95\linewidth}{\centering Missing file:\\\texttt{figures/training/mpnet\_eval\_loss.png}}}
+    }
+    \caption{MPNet - eval/loss}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \IfFileExists{figures/training/mpnet_train_loss.png}{
+      \includegraphics[width=\linewidth]{figures/training/mpnet_train_loss.png}
+    }{
+      \fbox{\parbox[c][4cm][c]{0.95\linewidth}{\centering Missing file:\\\texttt{figures/training/mpnet\_train\_loss.png}}}
+    }
+    \caption{MPNet - train/loss}
+  \end{subfigure}
+  \caption{Courbes d'entrainement MPNet (TensorBoard)}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \IfFileExists{figures/training/allminilm_eval_loss.png}{
+      \includegraphics[width=\linewidth]{figures/training/allminilm_eval_loss.png}
+    }{
+      \fbox{\parbox[c][4cm][c]{0.95\linewidth}{\centering Missing file:\\\texttt{figures/training/allminilm\_eval\_loss.png}}}
+    }
+    \caption{allMiniLM - eval/loss}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \IfFileExists{figures/training/allminilm_train_loss.png}{
+      \includegraphics[width=\linewidth]{figures/training/allminilm_train_loss.png}
+    }{
+      \fbox{\parbox[c][4cm][c]{0.95\linewidth}{\centering Missing file:\\\texttt{figures/training/allminilm\_train\_loss.png}}}
+    }
+    \caption{allMiniLM - train/loss}
+  \end{subfigure}
+  \caption{Courbes d'entrainement allMiniLM (TensorBoard)}
+\end{figure}
+
+Interpretation:
+\begin{itemize}[leftmargin=2em]
+  \item Les deux modeles apprennent correctement (train/loss en baisse).
+  \item MPNet presente une validation finale nettement plus basse
+        (\(\sim 1.08\) vs \(\sim 2.77\)), donc une generalisation plus robuste.
+  \item allMiniLM reste stable, mais avec un ecart train/validation plus eleve.
+  \item Cette lecture est coherente avec les metriques finales:
+        MPNet fine-tune est devant en \(F1@seuil\) et \(Recall@1\).
+\end{itemize}
+
+\section{Interpretation}
+\begin{itemize}[leftmargin=2em]
+  \item Le fine-tuning ameliore nettement les deux familles de modeles face a leur baseline.
+  \item MPNet fine-tune est le meilleur compromis global sur ce test
+        (\(F1=0.9811\), \(Acc=0.9904\), \(Recall@1=1.0000\)).
+  \item allMiniLM fine-tune reste performant, mais legerement en dessous du MPNet fine-tune.
+  \item Le calibrage du seuil est indispensable: a seuil fixe \(0.5\), les performances sont inferieures pour plusieurs modeles.
+\end{itemize}
+
+\section{Seuils recommandes pour l'application}
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{sidbrahim/narrativesAnalogues-allMiniLM}: seuil recommande \(0.2847\) (arrondi UI: \(0.28\)).
+  \item \texttt{sidbrahim/narrativesAnalogues-MPNet}: seuil recommande \(0.4632\) (arrondi UI: \(0.46\)).
+\end{itemize}

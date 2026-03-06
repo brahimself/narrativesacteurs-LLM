@@ -1,0 +1,70 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french,english]{babel}
+\usepackage{csquotes}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage[capitalize]{cleveref}
+\usepackage{enumitem}
+\usepackage{microtype}
+
+\usepackage[
+  backend=biber,
+  style=numeric,
+  sorting=nyt
+]{biblatex}
+\addbibresource{refs.bib}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\setstretch{1.2}
+\setcounter{tocdepth}{2}
+
+\title{Generation Automatisee de Narratives Analogues via LLM}
+\author{Equipe Projet}
+\date{\today}
+
+\begin{document}
+
+\pagenumbering{roman}
+\input{sections/00_frontmatter}
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+\input{sections/01_introduction}
+\input{sections/02_objectifs_perimetre}
+\input{sections/02a_conformite_enonce}
+\input{sections/03_donnees_pipeline}
+\input{sections/04_fusion_multilingue_en}
+\input{sections/05_paires_finetuning}
+\input{sections/06_protocole_eval}
+\input{sections/07_resultats}
+\input{sections/08_application_spaces}
+\input{sections/09_limites_ethique}
+\input{sections/10_conclusion}
+
+\printbibliography
+
+\appendix
+\input{sections/A_appendix}
+
+\end{document}
